@@ -2,7 +2,7 @@
 
 1.  Run `make` to compile our code.
 2.  Run `bash run.sh` to run the testing code.
-3.  Run `python3 plot-for-fig6.py` to plot the figure.
+3.  Run `python3 plot-for-fig6.py` to plot the figure using the latest results. Run `python3 plot-for-fig6.py results*` to plot the figure using target results.
 
 # Expected results
 
