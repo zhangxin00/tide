@@ -37,7 +37,7 @@ def find_latest_results_dir():
 
 def make_default_output_name(base_dir):
     base_name = os.path.basename(os.path.abspath(base_dir))
-    return f"q3a_{base_name}.png"
+    return f"fig6_{base_name}.png"
 
 
 def parse_final_results(file_path):
