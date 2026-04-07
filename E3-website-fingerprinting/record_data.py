@@ -8,6 +8,7 @@ from enum import Enum
 
 import argparse
 import ctypes
+from ctypes import cdll
 import json
 import logging
 import math
@@ -74,8 +75,8 @@ parser.add_argument("--num_runs", type=int, default=100)
 parser.add_argument(
     "--attacker_type",
     type=str,
-    choices=["javascript", "javascript_cache", "counter", "ebpf"],
-    default="javascript",
+    choices=["javascript", "javascript_cache", "counter", "ebpf", "irq"],
+    default="irq",
 )
 parser.add_argument(
     "--javascript_attacker_type",
@@ -109,6 +110,9 @@ parser.add_argument(
 )
 parser.add_argument(
     "--out_directory", type=str, default="data", help="The output directory name."
+)
+parser.add_argument(
+    "--start", type=str, default="data", help="The output directory name."
 )
 parser.add_argument(
     "--timer_resolution",
@@ -421,6 +425,7 @@ if opts.attacker_type == "javascript":
 
 def create_browser():
     browser = get_driver(opts.browser)
+    #browser.set_window_size(1920, 1080)
     browser.set_page_load_timeout(opts.trace_length)
     return browser
 
@@ -435,6 +440,7 @@ def get_time():
 def collect_data(q):
     data = [-1] * (opts.trace_length * 1000)
     trace_time = get_time() * 1000
+    idx = 0
 
     if opts.attacker_type == "counter":
         while True:
@@ -450,6 +456,22 @@ def collect_data(q):
                 num += 1
 
             data[idx] = num
+
+    elif opts.attacker_type == "irq":
+        
+        #lib = ctypes.CDLL('/Users/xin/bigger-fish' + '/tick.dylib') # Need to be modified
+        #lib.count_tick.restype = ctypes.c_int
+        #while True:
+            #if idx >= len(data):
+            #    break
+            #print(idx)
+        os.system("./tide");
+        with open('count.txt', 'r') as file:
+    # 去掉每行的换行符，并将字符串转换为整数
+            for line in file:
+                data[idx] = int(line.strip())
+                idx += 1
+
     elif opts.attacker_type == "javascript":
         try:
             attacker_browser.execute_script(
@@ -532,7 +554,7 @@ def record_trace(url):
     if len(results[0]) == 1 and results[0][0] == -1:
         return None
 
-    if opts.browser == Browser.SAFARI and opts.attacker_type == "javascript":
+    if opts.browser == Browser.SAFARI:
         browser.close()
 
     return results
@@ -606,7 +628,7 @@ def run(domain, update_fn=None):
         if not recording:
             break
 
-        if opts.browser == Browser.SAFARI and opts.attacker_type == "javascript":
+        if opts.browser == Browser.SAFARI:
             pass
         else:
             try:
@@ -670,7 +692,6 @@ with tqdm(total=total_traces) as pbar:
 
         if (
             opts.browser == Browser.SAFARI
-            and opts.attacker_type == "javascript"
             and browser is not None
         ):
             # Don't create a new browser in this case -- we will open a new
@@ -693,8 +714,7 @@ with tqdm(total=total_traces) as pbar:
 
         browser.quit()
 
-if opts.attacker_type == "javascript":
-    attacker_browser.quit()
+attacker_browser.quit()
 
 if opts.sites_list == "open_world":
     browser.quit()

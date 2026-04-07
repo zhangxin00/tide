@@ -1,0 +1,9 @@
+0
+sent 4041708 packets in 10000 ms
+
+1789977
+
+7
+sum count is 895327
+6
+sum count is 894650
