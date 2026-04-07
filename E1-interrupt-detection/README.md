@@ -1,6 +1,6 @@
 # Validating the x18 behavior
-1.  Run `make' to compile our code
-2.  Run `./irq' to check whether the x18 register is cleared when an interrupt occurs.
+1.  Run `make` to compile our code
+2.  Run `./irq` to check whether the x18 register is cleared when an interrupt occurs.
 
 # Expected results
 
